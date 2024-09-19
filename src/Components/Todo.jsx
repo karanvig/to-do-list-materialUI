@@ -16,7 +16,6 @@ const Todo = () => {
   // Effect to save todos in localStorage whenever the todos state changes
   useEffect(() => {
     localStorage.setItem('todos', JSON.stringify(todos));
-    console.log("Todos saved to local storage:", todos);
   }, [todos]);
 
   const addTodo = () => {
@@ -28,30 +27,47 @@ const Todo = () => {
   };
 
   const toggleTodo = (id) => {
-    setTodos(todos.map(todo => todo.id === id ? { ...todo, completed: !todo.completed } : todo));
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
   };
 
   const editTodo = (id, newTitle) => {
-    setTodos(todos.map(todo => todo.id === id ? { ...todo, title: newTitle } : todo));
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, title: newTitle } : todo
+      )
+    );
+  };
+
+  const deleteTodo = (id) => {
+    setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
   };
 
   const clearCompleted = () => {
-    setTodos(todos.filter(todo => !todo.completed));
+    setTodos(todos.filter((todo) => !todo.completed));
   };
 
   return (
-    <div style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
-      <h1>Todo List</h1>
+    <div className="max-w-xl mx-auto p-6 bg-gray-100 shadow-lg rounded-lg mt-10">
+      <h1 className="text-3xl font-bold mb-5 text-gray-700">Todo List</h1>
 
-      <InputTasks newTodo={newTodo} setNewTodo={setNewTodo} addTodo={addTodo} />
+      <InputTasks
+        newTodo={newTodo}
+        setNewTodo={setNewTodo}
+        addTodo={addTodo}
+      />
 
-      <List>
-        {todos.map(todo => (
+      <List className="mt-4 rounded-lg shadow-sm ">
+        {todos.map((todo) => (
           <Tasks
             key={todo.id}
             todo={todo}
             toggleTodo={toggleTodo}
             editTodo={editTodo}
+            deleteTodo={deleteTodo}
           />
         ))}
       </List>
@@ -60,7 +76,7 @@ const Todo = () => {
         variant="contained"
         color="secondary"
         onClick={clearCompleted}
-        style={{ marginTop: '20px' }}
+        className="mt-6 w-full bg-red-500 hover:bg-red-600 text-white"
       >
         Clear Completed
       </Button>

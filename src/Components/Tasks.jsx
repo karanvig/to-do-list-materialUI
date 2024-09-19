@@ -1,54 +1,81 @@
-/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
-import { Checkbox, TextField, ListItem, IconButton } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
+import { ListItem, ListItemText, Checkbox, IconButton, TextField } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 
-const Tasks = ({ todo, toggleTodo, editTodo }) => {
+const Tasks = ({ todo, toggleTodo, editTodo, deleteTodo }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newTitle, setNewTitle] = useState(todo.title);
 
+  // Enable editing mode on double-click
   const handleDoubleClick = () => {
     setIsEditing(true);
   };
 
+  // Save the edited todo
   const handleEdit = () => {
     if (newTitle.trim()) {
       editTodo(todo.id, newTitle);
-      setIsEditing(false);
     }
+    setIsEditing(false); // Exit edit mode
+  };
+
+  // Handle input change
+  const handleChange = (e) => {
+    setNewTitle(e.target.value);
+  };
+
+  // Save changes when "Enter" key is pressed or exit edit mode when "Escape" is pressed
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleEdit(); // Save the todo when Enter is pressed
+    } else if (e.key === 'Escape') {
+      setIsEditing(false); // Exit edit mode on Escape
+    }
+  };
+
+  // Handle delete action
+  const handleDelete = () => {
+    deleteTodo(todo.id);
   };
 
   return (
     <ListItem
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}
+      className="flex items-center justify-between p-4 bg-white border border-gray-300 rounded-lg shadow-md mb-2 hover:bg-gray-50 transition duration-300"
+      secondaryAction={
+        <IconButton
+          edge="end"
+          aria-label="delete"
+          className="text-red-500 hover:text-red-700"
+          onClick={handleDelete} // Attach delete handler
+        >
+          <DeleteIcon />
+        </IconButton>
+      }
     >
       <Checkbox
         checked={todo.completed}
         onChange={() => toggleTodo(todo.id)}
-        color="primary"
+        className="text-blue-500"
       />
 
       {isEditing ? (
         <TextField
           value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
-          onBlur={handleEdit}
-          onKeyDown={(e) => e.key === 'Enter' && handleEdit()}
-          variant="outlined"
-          size="small"
+          onChange={handleChange}
+          onBlur={handleEdit} // Save on losing focus
+          onKeyDown={handleKeyDown} // Save on "Enter", exit on "Escape"
+          autoFocus
           fullWidth
+          className="mr-3"
         />
       ) : (
-        <span onDoubleClick={handleDoubleClick}>{todo.title}</span>
+        <ListItemText
+          primary={todo.title}
+          onDoubleClick={handleDoubleClick} // Enable editing on double-click
+          style={{ textDecoration: todo.completed ? 'line-through' : 'none' }}
+          className="w-full text-gray-800 cursor-pointer break-words" // Ensure text wraps
+        />
       )}
-
-      <IconButton onClick={handleDoubleClick}>
-        <EditIcon />
-      </IconButton>
     </ListItem>
   );
 };
